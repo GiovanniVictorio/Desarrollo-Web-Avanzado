@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .div {
+            width: 80%;
+            height: 650px;
+        }
+    </style>
+</head>
+<body>
+    <div class="div">
+        <canvas id='canvas' width="900" height="650"></canvas>
+        <img id="img" src="logo.png" style="visibility: hidden;">
+    </div>
+
+    <script type="text/javascript">
+        var canvas = document.getElementById('canvas');
+
+        if (canvas.getContext){ 
+            var ctx = canvas.getContext("2d");
+
+            //Tenis
+			ctx.fillStyle="black";
+			ctx.fillRect(380,500,45,20);
+
+			ctx.fillStyle="black";
+			ctx.fillRect(286,500,45,20);
+
+			//Pantalon
+			ctx.fillStyle="gray";
+            ctx.strokeStyle="gray";
+			ctx.moveTo(301,320);
+			ctx.lineTo(301,500);
+			ctx.lineTo(330,500);
+			ctx.lineTo(357,320);
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.strokeStyle="gray";
+			ctx.fillStyle="gray";
+			ctx.moveTo(409,320);
+			ctx.lineTo(409,500);
+			ctx.lineTo(380,500);
+			ctx.lineTo(357,320);
+			ctx.fill();
+			ctx.stroke();
+
+			//Manos
+			ctx.strokeStyle="#eab26d";
+			ctx.fillStyle = "#eab26d";
+			ctx.beginPath();
+			ctx.arc(262,296,13,0,2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.strokeStyle="#eab26d";
+			ctx.fillStyle = "#eab26d";
+			ctx.beginPath();
+			ctx.arc(447,296,13,0,2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+			//Cara
+			ctx.fillStyle="#eab26d";
+			ctx.fillRect(335,130,35,40);
+
+			ctx.strokeStyle="#eab26d";
+			ctx.fillStyle = "#eab26d";
+			ctx.beginPath();
+			ctx.arc(350,110,49,0,2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.arc(335,105,7,0,2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+            ctx.fillStyle = "rgba(87,198,250,0.6)";
+			ctx.beginPath();
+			ctx.arc(335,105,14,0,2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.arc(365,105,7,0,2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+            ctx.fillStyle = "rgba(87,198,250,0.6)";
+			ctx.beginPath();
+			ctx.arc(365,105,14,0,2 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.arc(350,125,15,0,1 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+            ctx.fillStyle="white";
+			ctx.fillRect(338,125,25,4);
+
+			ctx.strokeStyle="white";
+			ctx.fillStyle = "white";
+			ctx.beginPath();
+			ctx.arc(350,125,4,0,1 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+			//Gorro
+			ctx.strokeStyle="#00A6F4";
+			ctx.fillStyle = "#00A6F4";
+			ctx.beginPath();
+			ctx.arc(350,95,48,3.1,0 * Math.PI);
+			ctx.fill();
+			ctx.stroke();
+
+			//Cuerpo
+			ctx.fillStyle="#00A6F4";
+			ctx.fillRect(300,170,110,150);
+			ctx.fill();
+
+            window.onload = function(){
+                var img = document.getElementById('img');
+            ctx.drawImage(img, 350, 190);
+            }
+
+			//Brazos
+			ctx.strokeStyle="#00A6F4";
+			ctx.fillStyle = "#00A6F4";
+			ctx.moveTo(300,171);
+			ctx.lineTo(250,290);
+			ctx.lineTo(274,290);
+			ctx.lineTo(300,220);
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.strokeStyle="#00A6F4";
+			ctx.fillStyle="#00A6F4";
+			ctx.moveTo(410,170);
+			ctx.lineTo(460,290);
+			ctx.lineTo(435,290);
+			ctx.lineTo(410,220);
+			ctx.fill();
+			ctx.stroke();
+        }
+    </script>
+</body>
+</html>

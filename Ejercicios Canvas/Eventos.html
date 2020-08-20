@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .div {
+            width: 80%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="div">
+        <canvas id='canvas' width="900" height="600"></canvas>
+    </div>
+
+    <script type="text/javascript">
+        var canvas = document.getElementById('canvas');
+
+        if (canvas.getContext){ 
+            var ctx = canvas.getContext("2d");
+            var press = false;
+
+            canvas.addEventListener('mousedown',function(evt){
+                press = true;
+            });
+
+            canvas.addEventListener('mouseup',function(evt){
+                press = false;
+            });
+
+            canvas.addEventListener('mousemove',function(evt){
+                
+                if (press){
+                    ctx.beginPath();
+                    ctx.arc(evt.layerX, evt.layerY, 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

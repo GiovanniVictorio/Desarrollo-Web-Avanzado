@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .div {
+            width: 80%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="div">
+        <canvas id='canvas'></canvas>
+        <img id="imagen" style="visibility: hidden;" src="grito.jpg">
+    </div>
+
+    <script type="text/javascript">
+        var canvas = document.getElementById('canvas');
+        if (canvas.getContext){ 
+            var ctx = canvas.getContext("2d");
+
+            window.onload = function(){
+                var img = document.getElementById('imagen');
+            ctx.drawImage(img, 0, 0);
+            }
+        }
+    </script>
+</body>
+</html>
