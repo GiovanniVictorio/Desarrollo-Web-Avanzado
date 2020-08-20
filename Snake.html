@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .div {
+            width: 80%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="div">
+        <canvas id='canvas' width="1000" height="650"></canvas>
+    </div>
+
+    <script type="text/javascript">
+        var canvas = null, ctx = null, x = 0, y = 0;
+        var lastPress = null, speed = 5, food = null, player = null;
+
+		window.requestAnimationFrame = (function(){
+			return window.requestAnimationFrame || 
+			window.mozRequestAnimationFrame || 
+			window.webkitRequestAnimationFrame || 
+			function (callback){
+				window.setTimeout(callback,17);
+			}
+		}());
+
+		function paint(ctx){
+			ctx.fillStyle = "black";
+			ctx.fillRect(0,0,canvas.width,canvas.height)
+
+			ctx.fillStyle = "#0f0";
+			ctx.fillRect(x,y,10,10);
+		}
+
+		function act(){
+            if( lastPress == 65 ){ //Izq
+                x -= speed;
+                if( x < 0 ){
+                    x = canvas.width;
+                }
+            }
+            if( lastPress == 68 ){ //Der
+                x = x + speed;
+                if( x > canvas.width ){
+                    x = 0;
+                }
+            }
+            if( lastPress == 87 ){ //Arriba
+                y -= speed;
+                if( y < 0 ){
+                    y = canvas.height;
+                }
+            }
+            if( lastPress == 83 ){ //Abajo
+                y = y + speed;
+                if( y > canvas.height ){
+                    y = 0;
+                }
+            }
+		}
+
+		function run(){
+			window.requestAnimationFrame(run);
+			act();
+			paint(ctx);
+		}
+
+		function init(){
+			canvas = document.getElementById('canvas');
+			ctx = canvas.getContext('2d');
+			run();
+		} 
+		
+		window.addEventListener('load',init,false);
+    
+        document.addEventListener('keydown', function(e){
+            lastPress = e.keyCode;
+        });
+    </script>
+</body>
+</html>
