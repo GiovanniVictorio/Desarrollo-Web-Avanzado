@@ -23,7 +23,7 @@
 
     <script type="text/javascript">
         var canvas = null, ctx = null, x = 0, y = 0;
-        var lastPress = null, speed = 5, food = null, player = null;
+        var lastPress = null, speed = 2, food = null, player = null, points = 0, nextLevel = 40;
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -38,11 +38,20 @@
 			ctx.fillStyle = "black";
 			ctx.fillRect(0,0,canvas.width,canvas.height)
 
+            ctx.fillStyle = "grey";
+			ctx.fillRect(0,30,canvas.width,5);
+
 			ctx.fillStyle = "#0f0";
 			player.paint(ctx);
 
 			ctx.fillStyle = "red";
 			food.paint(ctx);
+
+            ctx.fillStyle = "white";
+            ctx.font = "25px Arial";
+            ctx.fillText("Puntos: " + points, 850, 23);
+            ctx.fill();
+            ctx.stroke();
 		}
 
 		function act(){
@@ -60,19 +69,26 @@
             }
             if( lastPress == 87 ){ //Arriba
                 player.y -= speed;
-                if( player.y < 0 ){
+                if( player.y < 35 ){
                     player.y = canvas.height;
                 }
             }
             if( lastPress == 83 ){ //Abajo
                 player.y += speed;
                 if( player.y > canvas.height ){
-                    player.y = 0;
+                    player.y = 35;
                 }
             }
             if(player.intersects(food)){
 				food.x = random(canvas.width);
 				food.y = random(canvas.height);
+                points = points + 10;
+                console.log(points, nextLevel, speed);
+
+                if ( points == nextLevel ) {
+                    speed += 1;
+                    nextLevel += 40;
+                }
 			}
 		}
 
@@ -86,15 +102,17 @@
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
 
-            player = new Rectangle(0,0,10,10);
-			food = new Rectangle(70,50,10,10);
+            player = new Rectangle(0,31,10,10);
+			food = new Rectangle(random(canvas.width),random(canvas.height),10,10);
 			run();
 		} 
 		
 		window.addEventListener('load',init,false);
     
         document.addEventListener('keydown', function(e){
-            lastPress = e.keyCode;
+            if( e.keyCode==65 || e.keyCode ==  68 || e.keyCode ==  87 || e.keyCode ==  83 || e.keyCode ==  13 ) {
+				lastPress = e.keyCode; 
+            }
         });
 
         function Rectangle(x,y,w,h){
