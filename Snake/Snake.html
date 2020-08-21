@@ -6,14 +6,19 @@
     <title>Document</title>
     <style type="text/css">
         .div {
-            width: 80%;
-            height: 600px;
+            width: 95%;
+            height: 620px;
+            background-color: gray;
+        }
+        canvas {
+            margin-top: 10px;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
     <div class="div">
-        <canvas id='canvas' width="1000" height="650"></canvas>
+        <canvas id='canvas' width="1000" height="600"></canvas>
     </div>
 
     <script type="text/javascript">
@@ -34,34 +39,41 @@
 			ctx.fillRect(0,0,canvas.width,canvas.height)
 
 			ctx.fillStyle = "#0f0";
-			ctx.fillRect(x,y,10,10);
+			player.paint(ctx);
+
+			ctx.fillStyle = "red";
+			food.paint(ctx);
 		}
 
 		function act(){
             if( lastPress == 65 ){ //Izq
-                x -= speed;
-                if( x < 0 ){
-                    x = canvas.width;
+                player.x -= speed;
+                if( player.x < 0 ){
+                    player.x = canvas.width;
                 }
             }
             if( lastPress == 68 ){ //Der
-                x += speed;
-                if( x > canvas.width ){
-                    x = 0;
+                player.x += speed;
+                if( player.x > canvas.width ){
+                    player.x = 0;
                 }
             }
             if( lastPress == 87 ){ //Arriba
-                y -= speed;
-                if( y < 0 ){
-                    y = canvas.height;
+                player.y -= speed;
+                if( player.y < 0 ){
+                    player.y = canvas.height;
                 }
             }
             if( lastPress == 83 ){ //Abajo
-                y += speed;
-                if( y > canvas.height ){
-                    y = 0;
+                player.y += speed;
+                if( player.y > canvas.height ){
+                    player.y = 0;
                 }
             }
+            if(player.intersects(food)){
+				food.x = random(canvas.width);
+				food.y = random(canvas.height);
+			}
 		}
 
 		function run(){
@@ -73,6 +85,9 @@
 		function init(){
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
+
+            player = new Rectangle(0,0,10,10);
+			food = new Rectangle(70,50,10,10);
 			run();
 		} 
 		
@@ -81,6 +96,28 @@
         document.addEventListener('keydown', function(e){
             lastPress = e.keyCode;
         });
+
+        function Rectangle(x,y,w,h){
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+
+			this.paint = function(ctx){
+				ctx.fillRect(this.x,this.y,this.w,this.h);
+			}
+
+			this.intersects = function(rect){
+				if (this.x < rect.x + rect.w && this.x + this.w > rect.x && 
+					this.y < rect.y + rect.h && this.y + this.h > rect.y){
+					return true;
+				}
+			}
+		}
+
+        function random(m){
+			return Math.floor(Math.random()*m);
+		}
     </script>
 </body>
 </html>
