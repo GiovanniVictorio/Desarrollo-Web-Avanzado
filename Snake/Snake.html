@@ -6,7 +6,7 @@
     <title>Document</title>
     <style type="text/css">
         .div {
-            width: 95%;
+            width: 1020px;
             height: 620px;
             background-color: gray;
         }
@@ -22,8 +22,8 @@
     </div>
 
     <script type="text/javascript">
-        var canvas = null, ctx = null, x = 0, y = 0;
-        var lastPress = null, speed = 2, food = null, player = null, points = 0, nextLevel = 40;
+        var canvas = null, ctx = null, x = 0, y = 0, heightFood = 0;
+        var lastPress = null, speed = 2, food = null, player = null, points = 0, nextLevel = 40, pause = false;
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -52,38 +52,67 @@
             ctx.fillText("Puntos: " + points, 850, 23);
             ctx.fill();
             ctx.stroke();
+
+            ctx.fillStyle = "white";
+            ctx.font = "25px Arial";
+            ctx.fillText("Nivel: " + (speed - 1), 30, 23);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "white";
+            ctx.font = "35px Coming san";
+            ctx.fillText("Snake", 430, 25);
+            ctx.fill();
+            ctx.stroke();
+
+            if ( pause == true ) {
+                ctx.fillStyle = "white";
+                ctx.font = "40px Arial";
+                ctx.fillText("Pausa", 420, 300);
+                ctx.fill();
+                ctx.stroke();
+            }
 		}
 
 		function act(){
             if( lastPress == 65 ){ //Izq
+                pause = false;
                 player.x -= speed;
                 if( player.x < 0 ){
                     player.x = canvas.width;
                 }
             }
             if( lastPress == 68 ){ //Der
+                pause = false;
                 player.x += speed;
                 if( player.x > canvas.width ){
                     player.x = 0;
                 }
             }
             if( lastPress == 87 ){ //Arriba
+                pause = false;
                 player.y -= speed;
                 if( player.y < 35 ){
                     player.y = canvas.height;
                 }
             }
             if( lastPress == 83 ){ //Abajo
+                pause = false;
                 player.y += speed;
                 if( player.y > canvas.height ){
                     player.y = 35;
                 }
             }
+            if ( lastPress == 13 ){
+                pause = true;
+            }
             if(player.intersects(food)){
+                do {
+                    heightFood = random(canvas.height);
+                } while (heightFood < 35);
 				food.x = random(canvas.width);
-				food.y = random(canvas.height);
+				food.y = heightFood;
                 points = points + 10;
-                console.log(points, nextLevel, speed);
 
                 if ( points == nextLevel ) {
                     speed += 1;
@@ -102,8 +131,12 @@
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
 
-            player = new Rectangle(0,31,10,10);
-			food = new Rectangle(random(canvas.width),random(canvas.height),10,10);
+            player = new Rectangle(5,40,10,10);
+            do {
+                heightFood = random(canvas.height);
+            } while (heightFood < 35);
+			food = new Rectangle(random(canvas.width),heightFood,10,10);
+            console.log(heightFood);
 			run();
 		} 
 		
