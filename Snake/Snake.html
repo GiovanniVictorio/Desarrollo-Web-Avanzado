@@ -25,6 +25,7 @@
         var canvas = null, ctx = null, x = 0, y = 0, heightFood = 0, heightWalls = 0;
         var lastPress = null, speed = 2, food = null, player = null, points = 0, nextLevel = 40, pause = false;
         var walls = new Array(), gameOver = false;
+        var body = new Image(), apple = new Image();
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -43,10 +44,12 @@
 			ctx.fillRect(0,30,canvas.width,5);
 
 			ctx.fillStyle = "#0f0";
-			player.paint(ctx);
+			//player.paint(ctx);
+            ctx.drawImage(body, player.x, player.y);
 
 			ctx.fillStyle = "red";
-			food.paint(ctx);
+			//food.paint(ctx);
+            ctx.drawImage(apple, food.x, food.y);
 
             ctx.fillStyle = "white";
             ctx.font = "25px Arial";
@@ -89,50 +92,59 @@
 		}
 
 		function act(){
-            if( lastPress == 65 ){ //Izq
-                pause = false;
-                player.x -= speed;
-                if( player.x < 0 ){
-                    player.x = canvas.width;
+            if ( gameOver == false ){
+                if( lastPress == 65 ){ //Izq
+                    pause = false;
+                    player.x -= speed;
+                    if( player.x < 0 ){
+                        player.x = canvas.width;
+                    }
                 }
-            }
-            if( lastPress == 68 ){ //Der
-                pause = false;
-                player.x += speed;
-                if( player.x > canvas.width ){
-                    player.x = 0;
+                if( lastPress == 68 ){ //Der
+                    pause = false;
+                    player.x += speed;
+                    if( player.x > canvas.width ){
+                        player.x = 0;
+                    }
                 }
-            }
-            if( lastPress == 87 ){ //Arriba
-                pause = false;
-                player.y -= speed;
-                if( player.y < 35 ){
-                    player.y = canvas.height;
+                if( lastPress == 87 ){ //Arriba
+                    pause = false;
+                    player.y -= speed;
+                    if( player.y < 35 ){
+                        player.y = canvas.height;
+                    }
                 }
-            }
-            if( lastPress == 83 ){ //Abajo
-                pause = false;
-                player.y += speed;
-                if( player.y > canvas.height ){
-                    player.y = 35;
+                if( lastPress == 83 ){ //Abajo
+                    pause = false;
+                    player.y += speed;
+                    if( player.y > canvas.height ){
+                        player.y = 35;
+                    }
                 }
-            }
-            if ( lastPress == 13 ){
-                pause = true;
-            }
-            if(player.intersects(food)){
-                do {
-                    heightFood = random(canvas.height);
-                } while (heightFood < 35);
-				food.x = random(canvas.width);
-				food.y = heightFood;
-                points = points + 10;
+                if ( lastPress == 13 ){
+                    pause = true;
+                }
+                if(player.intersects(food)){
+                    do {
+                        heightFood = random(canvas.height);
+                    } while (heightFood < 35);
+                    food.x = random(canvas.width);
+                    food.y = heightFood;
+                    points = points + 10;
 
-                if ( points == nextLevel ) {
-                    speed += 1;
-                    nextLevel += 40;
+                    if ( points == nextLevel ) {
+                        speed += 1;
+                        nextLevel += 40;
+
+                        if ( speed > 3 ){
+                            do {
+                                heightWalls = random(canvas.height);
+                            } while (heightWalls < 35);
+                            walls.push(new Rectangle(random(canvas.width),heightWalls,10,10));
+                        }
+                    }
                 }
-			}
+            }
             for (var i = walls.length - 1; i >= 0; i--) {
 				if(walls[i].intersects(player)){
 					gameOver = true;
@@ -151,15 +163,14 @@
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
 
+            body.src = "img/head.png";
+            apple.src = "img/apple.png";
+
             player = new Rectangle(5,40,10,10);
             do {
                 heightFood = random(canvas.height);
             } while (heightFood < 35);
 			food = new Rectangle(random(canvas.width),heightFood,10,10);
-            do {
-                heightWalls = random(canvas.height);
-            } while (heightWalls < 35);
-            walls.push(new Rectangle(random(canvas.width),heightWalls,10,10));
 
 			run();
 		}
