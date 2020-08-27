@@ -26,6 +26,7 @@
         var lastPress = null, speed = 2, food = null, player = null, points = 0, nextLevel = 40, pause = false;
         var walls = new Array(), gameOver = false;
         var body = new Image(), apple = new Image();
+        var eats = new Audio(), youLost = new Audio(), pauseAudio = new Audio(); 
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -123,6 +124,7 @@
                 }
                 if ( lastPress == 13 ){
                     pause = true;
+                    pauseAudio.play(1000);
                 }
                 if(player.intersects(food)){
                     do {
@@ -131,6 +133,7 @@
                     food.x = random(canvas.width);
                     food.y = heightFood;
                     points = points + 10;
+                    eats.play();
 
                     if ( points == nextLevel ) {
                         speed += 1;
@@ -149,6 +152,7 @@
 				if(walls[i].intersects(player)){
 					gameOver = true;
                     lastPress = null;
+                    youLost.play();
 				}
 			}
 		}
@@ -171,6 +175,10 @@
                 heightFood = random(canvas.height);
             } while (heightFood < 35);
 			food = new Rectangle(random(canvas.width),heightFood,10,10);
+
+            eats.src = "img/eats.mp3"; 
+            youLost.src = "img/game_over.mp3";
+            pauseAudio.src = "img/pause.mp3";
 
 			run();
 		}
