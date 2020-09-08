@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluacion</title>
+    <style type="text/css">
+        .div {
+            width: 1020px;
+            height: 620px;
+            background-color: gray;
+        }
+        canvas {
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="div">
+        <canvas id='canvas' width="1000" height="600"></canvas>
+    </div>
+
+    <script type="text/javascript">
+       var canvas = null, ctx = null, x = 0, y = 0;
+        var lastPress = null, speed = 1, player = null, reloj = null, reloj2 = null, ghost = null, ghost2 = null, ghost3 = null, ghost4 = null, buttonWinner = null;
+        var gameWin = false, gameOver = false, pause = false, timer = 2500, lives = 3;
+        var movimiento = false, movimiento2 = false, movimiento3 = false, movimiento4 = false, stopGhostInter = false;
+        var body = new Image(), clock = new Image(), clock2 = new Image(),bodyGhost = new Image(), win = new Image(), live = new Image();
+        var winner = new Audio(), lose = new Audio(), clockAudio = new Audio(), clockAudio2 = new Audio(), gameO = new Audio();
+        var stopWinner = false, stopLose = false, StopClockAudio = false, StopClockAudio2 = false;
+        var wallsVertical = new Array(), wallsHorizontal = new Array();
+        var moreTime = false, moreTime2 =false;
+
+		window.requestAnimationFrame = (function(){
+			return window.requestAnimationFrame || 
+			window.mozRequestAnimationFrame || 
+			window.webkitRequestAnimationFrame || 
+			function (callback){
+				window.setTimeout(callback,17);
+			}
+		}());
+
+		function paint(ctx){
+			ctx.fillStyle = "black";
+			ctx.fillRect(0,0,canvas.width,canvas.height)
+
+            ctx.fillStyle = "grey";
+			ctx.fillRect(0,30,canvas.width,5);
+
+            ctx.fillStyle = "grey";
+            ctx.drawImage(win, buttonWinner.x, buttonWinner.y);
+
+            if ( moreTime == false ){
+                ctx.fillStyle = "red";
+                ctx.drawImage(clock, reloj.x, reloj.y);
+            }
+			
+            if ( moreTime2 == false ){
+                ctx.fillStyle = "red";
+                ctx.drawImage(clock2, reloj2.x, reloj2.y);
+            }
+
+            ctx.fillStyle = "#0f0";
+            //ctx.fillRect(player.x,player.y,20,30);
+            ctx.drawImage(body, player.x, player.y);
+
+            ctx.fillStyle = "fff";
+            ctx.drawImage(bodyGhost, ghost.x, ghost.y);
+
+            ctx.fillStyle = "fff";
+            ctx.drawImage(bodyGhost, ghost2.x, ghost2.y);
+
+            ctx.fillStyle = "fff";
+            ctx.drawImage(bodyGhost, ghost3.x, ghost3.y);
+
+            ctx.fillStyle = "fff";
+            ctx.drawImage(bodyGhost, ghost4.x, ghost4.y);
+
+            ctx.fillStyle = "white";
+            ctx.font = "30px Coming san";
+            ctx.fillText("Laberinto", 430, 25);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "white";
+            ctx.font = "30px Coming san";
+            ctx.fillText("Time: " + timer, 830, 25);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "white";
+            ctx.font = "30px Coming san";
+            ctx.fillText("Vidas: ", 20, 25);
+            ctx.fill();
+            ctx.stroke();
+            if ( lives > 0 ){
+                ctx.drawImage(live, 103, 4)
+            }
+            if ( lives > 1 ){
+                ctx.drawImage(live, 130, 4)
+            }
+            if ( lives > 2 ){
+                ctx.drawImage(live, 157, 4)
+            }
+
+            ctx.fillStyle = "grey";
+            for ( var i = wallsVertical.length - 1; i >= 0; i-- ){
+                wallsVertical[i].paint(ctx);
+            }
+
+            ctx.fillStyle = "grey";
+            for ( var i = wallsHorizontal.length - 1; i >= 0; i-- ){
+                wallsHorizontal[i].paint(ctx);
+            }
+
+            if ( gameWin == true ){
+                ctx.fillStyle = "black";
+                ctx.font = "100px Coming san";
+                ctx.fillText("W I N N E R", 237, 297);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.font = "100px Coming san";
+                ctx.fillText("W I N N E R", 240, 300);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            if ( gameOver == true ){
+                ctx.fillStyle = "black";
+                ctx.font = "100px Coming san";
+                ctx.fillText("G A M E O V E R", 117, 297);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.font = "100px Coming san";
+                ctx.fillText("G A M E O V E R", 120, 300);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            if ( pause == true ){
+                ctx.fillStyle = "black";
+                ctx.font = "100px Coming san";
+                ctx.fillText("P A U S E", 277, 297);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.font = "100px Coming san";
+                ctx.fillText("P A U S E", 280, 300);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            if ( lastPress == null ){
+                ctx.fillStyle = "black";
+                ctx.font = "50px Coming san";
+                ctx.fillText("W A S D", 387, 267);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.font = "50px Coming san";
+                ctx.fillText("W A S D", 390, 270);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = "black";
+                ctx.font = "25px Coming san";
+                ctx.fillText("para moverse", 412, 287);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.font = "25px Coming san";
+                ctx.fillText("para moverse", 415, 290);
+                ctx.fill();
+                ctx.stroke();
+            }
+		}
+
+		function act(){
+            if ( gameWin == false && gameOver == false && lastPress != null ){
+                if ( pause == false && stopGhostInter == false ){
+                    timer--;
+                    movGhost();
+                }
+                if( lastPress == 65 ){ //Izq
+                    pause = false;
+                    player.x -= speed;
+                    for ( var i = wallsVertical.length - 1; i >= 0; i-- ){
+                        if ( wallsVertical[i].intersects(player) ){
+                            lastPress = 81;
+                        }
+                    }
+                    if( player.x < 0 ){
+                        player.x = canvas.width;
+                    }
+                }
+                if( lastPress == 68 ){ //Der
+                    pause = false;
+                    player.x += speed;
+                    for ( var i = wallsVertical.length - 1; i >= 0; i-- ){
+                        if ( wallsVertical[i].intersects(player) ){
+                            lastPress = 81;
+                        }
+                    }
+                    if( player.x > canvas.width ){
+                        player.x = 0;
+                    }
+                }
+                if( lastPress == 87 ){ //Arriba
+                    pause = false;
+                    player.y -= speed;
+                    for ( var i = wallsHorizontal.length - 1; i >= 0; i-- ){
+                        if ( wallsHorizontal[i].intersects(player) ){
+                            lastPress = 81;
+                        }
+                    }
+                    if( player.y < 35 ){
+                        player.y = canvas.height;
+                    }
+                }
+                if( lastPress == 83 ){ //Abajo
+                    pause = false;
+                    player.y += speed;
+                    for ( var i = wallsHorizontal.length - 1; i >= 0; i-- ){
+                        if ( wallsHorizontal[i].intersects(player) ){
+                            lastPress = 81;
+                        }
+                    }
+                    if( player.y > canvas.height ){
+                        player.y = 35;
+                    }
+                }
+                if( lastPress == 13 ){
+                    pause = true;
+                }
+                if( player.intersects(buttonWinner) ){
+                    gameWin = true;
+                    if ( stopWinner == false ){
+                        winner.play();
+                        stopWinner = true;
+                    }
+                }
+                if ( player.intersects(reloj) && moreTime == false ){
+                    timer += 750;
+                    moreTime = true;
+                    if ( StopClockAudio == false ){
+                        clockAudio.play();
+                        StopClockAudio = true;
+                    }
+                }
+                if ( player.intersects(reloj2) && moreTime2 == false ){
+                    timer += 750;
+                    moreTime2 = true;
+                    if ( StopClockAudio2 == false ){
+                        clockAudio2.play();
+                        StopClockAudio2 = true;
+                    }
+                }
+                if( player.intersects(ghost) || player.intersects(ghost2) || player.intersects(ghost3) || player.intersects(ghost4) ){
+                    lives --;
+                    if ( lives == 0 ){
+                        gameOver = true;
+                        gameO.play();
+                        setTimeout(function(){
+                            reset();
+                        }, 2000);
+                    } else {
+                        lose.play();
+                        timer = 2500;
+                        lastPress = null;
+                        moreTime = false;
+                        moreTime2 = false;
+                        player.x = 5;
+                        player.y = 40;
+                    }
+                }
+                if( timer == 00000 ){  
+                    lives --; 
+                    if ( lives == 0 ){
+                        gameOver = true;
+                        gameO.play();
+                        setTimeout(function(){
+                            reset();
+                        }, 2000);
+                    } else {
+                        lose.play();
+                        timer = 2500;
+                        lastPress = null;
+                        moreTime = false;
+                        moreTime2 = false;
+                        player.x = 5;
+                        player.y = 40;
+                    }
+                }
+            }  
+		}
+
+        function movGhost(){
+            if ( ghost.x == 230 ){
+                movimiento = true
+            } else if (ghost.x == 5 ){
+                movimiento = false;
+            }
+            if ( movimiento == false ){
+                ghost.x += 1;
+            } else if ( movimiento == true ){
+                ghost.x -= 1;
+            }
+            //Ghost 2
+            if ( ghost2.x == 530 ){
+                movimiento2 = true
+            } else if (ghost2.x == 129 ){
+                movimiento2 = false;
+            }
+            if ( movimiento2 == false ){
+                ghost2.x += 1;
+            } else if ( movimiento2 == true ){
+                ghost2.x -= 1;
+            }
+            //Ghost 3
+            if ( ghost3.x == 297 ){
+                movimiento3 = true
+            } else if (ghost3.x == 639 ){
+                movimiento3 = false;
+            }
+            if( ghost3.x < 6 ){
+                ghost3.x = canvas.width - 5;
+            }
+            if( ghost3.x > canvas.width - 5 ){
+                ghost3.x = 5;
+            }
+            if ( movimiento3 == false ){
+                ghost3.x += 1;
+            } 
+            if ( movimiento3 == true ){
+                ghost3.x -= 1;
+            }
+            //Ghost 4
+            if ( ghost4.x == 860 ){
+                movimiento4 = true
+            } else if (ghost4.x == 375 ){
+                movimiento4 = false;
+            }
+            if ( movimiento4 == false ){
+                ghost4.x += 1;
+            } else if ( movimiento4 == true ){
+                ghost4.x -= 1;
+            }
+        }
+
+        function reset(){
+            timer = 2500;
+            lastPress = null;
+            moreTime = false;
+            moreTime2 = false;
+            player.x = 5;
+            player.y = 40;
+            gameOver = false;
+            gameWin = false; 
+            pause = false;
+            lives = 3;
+            movimiento = false;
+            movimiento2 = false;
+            movimiento3 = false;
+            movimiento4 = false;
+            stopGhostInter = false;
+            stopWinner = false;
+            stopLose = false;
+            StopClockAudio = false;
+            StopClockAudio2 = false;
+            ghost.x = 5;
+            ghost.y = 85;
+            ghost2.x = 130;
+            ghost2.y = 325;
+            ghost3.x = 640;
+            ghost3.y = 405;
+            ghost4.x = 375;
+            ghost4.y = 485;
+        }
+
+		function run(){
+			window.requestAnimationFrame(run);
+			act();
+			paint(ctx);
+		}
+
+		function init(){
+			canvas = document.getElementById('canvas');
+			ctx = canvas.getContext('2d');
+
+            body.src = "img/jugador.png";
+            bodyGhost.src = "img/fantasma.png";
+            win.src = "img/fruta.png";
+            live.src = "img/vida.png";
+            clock.src = "img/reloj.png";
+            clock2.src = "img/reloj.png";
+
+            winner.src = "audio/ganar.mp3";
+            lose.src = "audio/perder.mp3";
+            clockAudio.src = "audio/tiempo.mp3";
+            clockAudio2.src = "audio/tiempo.mp3";
+            gameO.src = "audio/game_over.mp3";
+
+            player = new Rectangle(5,38,20,25);
+            reloj = new Rectangle(342,205,20,20);
+            reloj2 = new Rectangle(520,485,20,20);
+            ghost = new Rectangle(5, 85, 20, 20);
+            ghost2 = new Rectangle(130, 325, 20, 20);
+            ghost3 = new Rectangle(640, 405, 20, 20);
+            ghost4 = new Rectangle(375, 485, 20, 20);
+            buttonWinner = new Rectangle(945, 545, 50, 50);
+
+            paintWalls();
+
+			run();
+		}
+
+        function paintWalls(){
+            wallsHorizontal.push(new Rectangle(0,30,1000,7));
+            //Linea 1
+            wallsHorizontal.push(new Rectangle(0,70,100,10));
+            wallsHorizontal.push(new Rectangle(130,70,50,10));
+            wallsHorizontal.push(new Rectangle(230,70,250,10));
+            wallsHorizontal.push(new Rectangle(510,70,50,10));
+            wallsHorizontal.push(new Rectangle(590,70,100,10));
+            wallsHorizontal.push(new Rectangle(720,70,200,10));
+            wallsHorizontal.push(new Rectangle(950,70,50,10));
+            //Linea 2
+            wallsHorizontal.push(new Rectangle(30,110,150,10));
+            wallsHorizontal.push(new Rectangle(210,110,90,10));
+            wallsHorizontal.push(new Rectangle(330,110,70,10));
+            wallsHorizontal.push(new Rectangle(430,110,200,10));
+            wallsHorizontal.push(new Rectangle(660,110,50,10));
+            wallsHorizontal.push(new Rectangle(740,110,150,10));
+            wallsHorizontal.push(new Rectangle(920,110,80,10));
+            //Linea 3
+            wallsHorizontal.push(new Rectangle(0,150,80,10));
+            wallsHorizontal.push(new Rectangle(110,150,120,10));
+            wallsHorizontal.push(new Rectangle(260,150,120,10));
+            wallsHorizontal.push(new Rectangle(410,150,50,10));
+            wallsHorizontal.push(new Rectangle(490,150,250,10));
+            wallsHorizontal.push(new Rectangle(770,150,80,10));
+            wallsHorizontal.push(new Rectangle(880,150,90,10));
+            //Linea 4
+            wallsHorizontal.push(new Rectangle(0,190,50,10));
+            wallsHorizontal.push(new Rectangle(80,190,80,10));
+            wallsHorizontal.push(new Rectangle(190,190,100,10));
+            wallsHorizontal.push(new Rectangle(320,190,300,10));
+            wallsHorizontal.push(new Rectangle(650,190,50,10));
+            wallsHorizontal.push(new Rectangle(730,190,170,10));
+            wallsHorizontal.push(new Rectangle(930,190,70,10));
+            //Linea 5
+            wallsHorizontal.push(new Rectangle(30,230,130,10));
+            wallsHorizontal.push(new Rectangle(190,230,50,10));
+            wallsHorizontal.push(new Rectangle(270,230,130,10));
+            wallsHorizontal.push(new Rectangle(430,230,150,10));
+            wallsHorizontal.push(new Rectangle(610,230,200,10));
+            wallsHorizontal.push(new Rectangle(840,230,130,10));
+            //Linea 6
+            wallsHorizontal.push(new Rectangle(0,270,100,10));
+            wallsHorizontal.push(new Rectangle(130,270,240,10));
+            wallsHorizontal.push(new Rectangle(400,270,70,10));
+            wallsHorizontal.push(new Rectangle(500,270,150,10));
+            wallsHorizontal.push(new Rectangle(680,270,80,10));
+            wallsHorizontal.push(new Rectangle(790,270,210,10));
+            //Linea 7
+            wallsHorizontal.push(new Rectangle(0,310,150,10));
+            wallsHorizontal.push(new Rectangle(180,310,70,10));
+            wallsHorizontal.push(new Rectangle(280,310,120,10));
+            wallsHorizontal.push(new Rectangle(430,310,280,10));
+            wallsHorizontal.push(new Rectangle(740,310,50,10));
+            wallsHorizontal.push(new Rectangle(820,310,80,10));
+            wallsHorizontal.push(new Rectangle(930,310,70,10));
+            //Linea 8
+            wallsHorizontal.push(new Rectangle(30,350,50,10));
+            wallsHorizontal.push(new Rectangle(110,350,100,10));
+            wallsHorizontal.push(new Rectangle(240,350,200,10));
+            wallsHorizontal.push(new Rectangle(470,350,100,10));
+            wallsHorizontal.push(new Rectangle(600,350,70,10));
+            wallsHorizontal.push(new Rectangle(700,350,270,10));
+            //Linea 9
+            wallsHorizontal.push(new Rectangle(0,390,150,10));
+            wallsHorizontal.push(new Rectangle(180,390,100,10));
+            wallsHorizontal.push(new Rectangle(310,390,50,10));
+            wallsHorizontal.push(new Rectangle(390,390,130,10));
+            wallsHorizontal.push(new Rectangle(550,390,250,10));
+            wallsHorizontal.push(new Rectangle(830,390,170,10));
+            //Linea 10
+            wallsHorizontal.push(new Rectangle(0,430,80,10));
+            wallsHorizontal.push(new Rectangle(110,430,120,10));
+            wallsHorizontal.push(new Rectangle(260,430,300,10));
+            wallsHorizontal.push(new Rectangle(590,430,50,10));
+            wallsHorizontal.push(new Rectangle(670,430,80,10));
+            wallsHorizontal.push(new Rectangle(780,430,190,10));
+            //Linea 11
+            wallsHorizontal.push(new Rectangle(0,470,30,10));
+            wallsHorizontal.push(new Rectangle(60,470,80,10));
+            wallsHorizontal.push(new Rectangle(170,470,210,10));
+            wallsHorizontal.push(new Rectangle(410,470,60,10));
+            wallsHorizontal.push(new Rectangle(500,470,100,10));
+            wallsHorizontal.push(new Rectangle(630,470,200,10));
+            wallsHorizontal.push(new Rectangle(860,470,50,10));
+            wallsHorizontal.push(new Rectangle(940,470,60,10));
+            //Linea 12
+            wallsHorizontal.push(new Rectangle(0,510,100,10));
+            wallsHorizontal.push(new Rectangle(130,510,200,10));
+            wallsHorizontal.push(new Rectangle(360,510,50,10));
+            wallsHorizontal.push(new Rectangle(440,510,120,10));
+            wallsHorizontal.push(new Rectangle(590,510,40,10));
+            wallsHorizontal.push(new Rectangle(660,510,100,10));
+            wallsHorizontal.push(new Rectangle(690,510,110,10));
+            wallsHorizontal.push(new Rectangle(830,510,100,10));
+            wallsHorizontal.push(new Rectangle(960,510,40,10));
+            //Linea 13
+            wallsHorizontal.push(new Rectangle(0,550,50,10));
+            wallsHorizontal.push(new Rectangle(80,550,100,10));
+            wallsHorizontal.push(new Rectangle(210,550,30,10));
+            wallsHorizontal.push(new Rectangle(270,550,200,10));
+            wallsHorizontal.push(new Rectangle(500,550,130,10));
+            wallsHorizontal.push(new Rectangle(660,550,270,10));
+            //Linea 14
+            wallsHorizontal.push(new Rectangle(0,590,930,10));
+
+            //Filas (linea 0 y 1)
+            wallsVertical.push(new Rectangle(350,37,10,40));
+            wallsVertical.push(new Rectangle(850,37,10,40));
+            //Filas (linea 1 y 2)
+            wallsVertical.push(new Rectangle(250,80,10,40));
+            wallsVertical.push(new Rectangle(600,80,10,40));
+            wallsVertical.push(new Rectangle(750,80,10,40));
+            //Filas (linea 3 y 4)
+            wallsVertical.push(new Rectangle(70,120,10,40));
+            wallsVertical.push(new Rectangle(290,120,10,40));
+            wallsVertical.push(new Rectangle(540,120,10,40));
+            wallsVertical.push(new Rectangle(800,120,10,40));
+            //Filas (linea 4 y 5)
+            wallsVertical.push(new Rectangle(130,160,10,40));
+            wallsVertical.push(new Rectangle(350,160,10,40));
+            wallsVertical.push(new Rectangle(670,160,10,40));
+            wallsVertical.push(new Rectangle(930,160,10,40));
+            //Filas (linea 5 y 6)
+            wallsVertical.push(new Rectangle(320,200,10,40));
+            wallsVertical.push(new Rectangle(740,200,10,40));
+            wallsVertical.push(new Rectangle(950,200,10,40));
+            //Filas (linea 6 y 7)
+            wallsVertical.push(new Rectangle(130,240,10,40));
+            wallsVertical.push(new Rectangle(450,240,10,40));
+            wallsVertical.push(new Rectangle(800,240,10,40));
+            //Filas (linea 7 y 8)
+            wallsVertical.push(new Rectangle(205,280,10,40));
+            wallsVertical.push(new Rectangle(500,280,10,40));
+            wallsVertical.push(new Rectangle(750,280,10,40));
+            //Filas (linea 8 y 9)
+            wallsVertical.push(new Rectangle(110,320,10,40));
+            wallsVertical.push(new Rectangle(550,320,10,40));
+            wallsVertical.push(new Rectangle(950,320,10,40));
+            //Filas (linea 10 y 11)
+            wallsVertical.push(new Rectangle(180,360,10,40));
+            wallsVertical.push(new Rectangle(400,360,10,40));
+            wallsVertical.push(new Rectangle(700,360,10,40));
+            //Filas (linea 11 y 12)
+            wallsVertical.push(new Rectangle(320,400,10,40));
+            wallsVertical.push(new Rectangle(620,400,10,40));
+            //Filas (linea 12 y 13)
+            wallsVertical.push(new Rectangle(180,440,10,40));
+            wallsVertical.push(new Rectangle(510,440,10,40));
+            wallsVertical.push(new Rectangle(740,440,10,40));
+            wallsVertical.push(new Rectangle(950,440,10,40));
+            //Filas (linea 13 y 14)
+            wallsVertical.push(new Rectangle(60,480,10,40));
+            wallsVertical.push(new Rectangle(360,480,10,40));
+            wallsVertical.push(new Rectangle(880,480,10,40));
+            //Filas (linea 14 y 15)
+            wallsVertical.push(new Rectangle(160,520,10,40));
+            wallsVertical.push(new Rectangle(380,520,10,40));
+            wallsVertical.push(new Rectangle(600,520,10,40));
+            wallsVertical.push(new Rectangle(890,520,10,40));
+            //Filas (linea 15 y 16)
+            wallsVertical.push(new Rectangle(310,560,10,40));
+            wallsVertical.push(new Rectangle(520,560,10,40));
+        }
+		
+		window.addEventListener('load',init,false);
+    
+        document.addEventListener('keydown', function(e){
+            if( e.keyCode==65 || e.keyCode ==  68 || e.keyCode ==  87 || e.keyCode ==  83 || e.keyCode ==  13 ) {
+				lastPress = e.keyCode; 
+            }
+        });
+
+        function Rectangle(x,y,w,h){
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+
+			this.paint = function(ctx){
+				ctx.fillRect(this.x,this.y,this.w,this.h);
+			}
+
+			this.intersects = function(rect){
+				if (this.x < rect.x + rect.w && this.x + this.w > rect.x && 
+					this.y < rect.y + rect.h && this.y + this.h > rect.y){
+					return true;
+				}
+			}
+		}
+
+        function random(m){
+			return Math.floor(Math.random()*m);
+		}
+    </script>
+</body>
+</html>
