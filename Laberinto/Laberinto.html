@@ -24,7 +24,7 @@
     <script type="text/javascript">
        var canvas = null, ctx = null, x = 0, y = 0;
         var lastPress = null, speed = 1, player = null, reloj = null, reloj2 = null, ghost = null, ghost2 = null, ghost3 = null, ghost4 = null, buttonWinner = null;
-        var gameWin = false, gameOver = false, pause = false, timer = 2500, lives = 3;
+        var gameWin = false, gameOver = false, pause = false, timer = 2000, lives = 3;
         var movimiento = false, movimiento2 = false, movimiento3 = false, movimiento4 = false, stopGhostInter = false;
         var body = new Image(), clock = new Image(), clock2 = new Image(),bodyGhost = new Image(), win = new Image(), live = new Image();
         var winner = new Audio(), lose = new Audio(), clockAudio = new Audio(), clockAudio2 = new Audio(), gameO = new Audio();
@@ -240,6 +240,9 @@
                     if ( stopWinner == false ){
                         winner.play();
                         stopWinner = true;
+                        setTimeout(function(){
+                            reset();
+                        }, 5000);
                     }
                 }
                 if ( player.intersects(reloj) && moreTime == false ){
@@ -265,10 +268,10 @@
                         gameO.play();
                         setTimeout(function(){
                             reset();
-                        }, 2000);
+                        }, 2500);
                     } else {
                         lose.play();
-                        timer = 2500;
+                        timer = 2000;
                         lastPress = null;
                         moreTime = false;
                         moreTime2 = false;
@@ -283,10 +286,10 @@
                         gameO.play();
                         setTimeout(function(){
                             reset();
-                        }, 2000);
+                        }, 2500);
                     } else {
                         lose.play();
-                        timer = 2500;
+                        timer = 2000;
                         lastPress = null;
                         moreTime = false;
                         moreTime2 = false;
@@ -351,7 +354,7 @@
         }
 
         function reset(){
-            timer = 2500;
+            timer = 2000;
             lastPress = null;
             moreTime = false;
             moreTime2 = false;
@@ -523,6 +526,9 @@
             //Linea 14
             wallsHorizontal.push(new Rectangle(0,590,930,10));
 
+            wallsVertical.push(new Rectangle(-9,37,10,600));
+
+            wallsVertical.push(new Rectangle(999,37,10,600));
             //Filas (linea 0 y 1)
             wallsVertical.push(new Rectangle(350,37,10,40));
             wallsVertical.push(new Rectangle(850,37,10,40));
