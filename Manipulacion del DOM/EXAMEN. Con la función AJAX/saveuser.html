@@ -68,7 +68,7 @@
 					</tr>
 				</thead>
 				<tbody id="content_table">
-
+					
 				</tbody>
 			</table>
 
@@ -105,6 +105,15 @@
 				$("#email").val("")
 				$("#password").val("")
 				$("#year").val("")
+			})
+
+			$("#mostrar_info").click( () =>{
+				$.ajax({
+					url:'content_file.php',
+					success:function(r){
+						$("#content_table").html(r)
+					}
+				})
 			})
 		})
 	</script>
