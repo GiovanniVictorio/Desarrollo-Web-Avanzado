@@ -1,3 +1,11 @@
+<?php 
+	include "configPhp/userController.php";
+	$userController = new UserController();
+
+	$users = $userController->get();
+	#echo json_encode($users);
+ ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -62,30 +70,32 @@
 										<thead class="thead-dark">
 											<tr>
 												<th scope="col">#</th>
-												<th scope="col">First</th>
-												<th scope="col">Last</th>
-												<th scope="col">Handle</th>
+												<th scope="col">Nombre</th>
+												<th scope="col">Correo electronico</th>
+												<th scope="col">Estatus</th>
+												<th scope="col"></th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr>
 												<th scope="row">1</th>
 												<td>Mark</td>
-												<td>Otto</td>
+												<td>
+													<a href="mailo:otto@example.com">
+														Otto@example.com
+													</a>
+												</td>
 												<td>@mdo</td>
+												<td style="float: right;">
+													<button type="button" class="btn btn-warning">
+														<i class="fa fa-pencil"></i> Editar
+													</button>
+													<button type="button" onclick="remove(1)" class="btn btn-warning">
+														<i class="fa fa-trash"></i> Eliminar
+													</button>
+												</td>
 											</tr>
-											<tr>
-												<th scope="row">2</th>
-												<td>Jacob</td>
-												<td>Thornton</td>
-												<td>@fat</td>
-											</tr>
-											<tr>
-												<th scope="row">3</th>
-												<td>Larry</td>
-												<td>the Bird</td>
-												<td>@twitter</td>
-											</tr>
+											
 										</tbody>
 									</table>
 								</div>
@@ -176,6 +186,8 @@
 			<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 			<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+			<script type="text/javascript" src="recursos/jquery-3.5.1.min.js"></script>
 			<script type="text/javascript">
 				function validateRegister(){
 					console.log(1)
@@ -192,6 +204,24 @@
 						return false;
 					}
 				}
+
+				function remove(id){
+					swal({
+						title: "",
+						text: "¿Desea eliminar el usuario?",
+						icon: "warning",
+						buttons: true,
+						dangerMode: true,
+						buttons: ["Cancelar", "Eliminar"],
+					})
+					.then( (willDelete) => {
+						if ( willDelete ){
+							swal("Usuario eliminado con exito!", {
+								icon: "success",
+							});
+						}
+					});
+				}
 			</script>
-		</body>
-		</html>
+</body>
+</html>
