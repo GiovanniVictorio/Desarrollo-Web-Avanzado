@@ -2,6 +2,23 @@
 	include_once "config.php";
 	include_once "ConectionController.php";
 
+	if ( isset($_POST) && isset($_POST['action']) ) {
+
+		$userController = new UserController();
+
+		switch ( $_POST['action'] ) {
+			case 'store':
+
+				$name = strip_tags($_POST['name']);
+				$email = strip_tags($_POST['email']);
+				$password = strip_tags($_POST['password']);
+
+				$userController->store($name,$email,$password);
+
+				break;
+		}
+	}
+
 	class UserController {
 		function get(){
 			$conn = connect();
@@ -17,6 +34,40 @@
 					return $users;
 				} else { return Array(); }
 			} else { return Array(); }
+		}
+
+		function store($name, $email, $password) {
+			$conn = connect();
+			if ( !$conn->connect_error ) {
+
+				if ( $name!="" && $email!="" && $password!="" ) {
+
+					$query = "insert into user (name,email,password) values (?,?,?)";
+					$prepared_query = $conn->prepare($query);
+					$prepared_query->bind_param('sss',$name,$email,$password);
+					if ( $prepared_query->execute() ) { 
+						$_SESSION['status'] = "success";
+						$_SESSION['message'] = "El registro se ha guardado";
+
+						header("Location:" . $_SERVER['HTTP_REFERER']); 
+					} else {
+						$_SESSION['status'] = "error";
+						$_SESSION['message'] = "El registro no se ha guardado";
+
+						header("Location:" . $_SERVER['HTTP_REFERER']);
+					}
+				} else { 
+					$_SESSION['status'] = "error";
+					$_SESSION['message'] = "Revise la informacion enviada";
+
+					header("Location:" . $_SERVER['HTTP_REFERER']); 
+				}
+			} else { 
+				$_SESSION['status'] = "error";
+				$_SESSION['message'] = "Error durante la conexion";
+
+				header("Location:" . $_SERVER['HTTP_REFERER']); 
+			}
 		}
 	}
 ?>
