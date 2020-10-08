@@ -88,7 +88,7 @@
 						<div class="card-header">
 							Lista de usuarios registrados
 
-							<button type="button" data-toggle="modal" data-target="#staticBackdrop" class="btn btn-primary float-right">
+							<button type="button" onclick="add()" data-toggle="modal" data-target="#staticBackdrop" class="btn btn-primary float-right">
 								Añadir usuario
 							</button>
 						</div>
@@ -130,7 +130,7 @@
 											<?php endif ?>
 										</td>
 										<td style="float: right;">
-											<button type="button" class="btn btn-warning">
+											<button type="button" class="btn btn-warning" data-info='<?= json_encode($user) ?>' data-toggle="modal" data-target="#staticBackdrop" onclick="editar(this)" >
 												<i class="fa fa-pencil"></i> Editar
 											</button>
 											<button type="button" onclick="remove(1)" class="btn btn-warning">
@@ -161,7 +161,7 @@
 					</button>
 				</div>
 
-				<form method="POST" action="configPhp/UserController.php" onsubmit="return validateRegister()">
+				<form method="POST" id="myForm" action="configPhp/UserController.php" onsubmit="return validateRegister()">
 					<div class="modal-body">
 						<!-- Nombres -->
 						<div class="form-group">
@@ -172,7 +172,7 @@
 										<i class="fa fa-user"></i>
 									</span>
 								</div>
-								<input type="text" class="form-control" placeholder="Benito Camelo" aria-label="Username" aria-describedby="basic-addon1" required="" name="name">
+								<input type="text" class="form-control" placeholder="Benito Camelo" aria-label="Username" aria-describedby="basic-addon1" required="" name="name" id="name">
 							</div>
 							<small id="emailHelp" class="form-text text-muted">No ingresar numeros o caracteres especiales.</small>
 						</div>
@@ -185,7 +185,7 @@
 										<i class="fa fa-envelope" aria-hidden="true"></i>
 									</span>
 								</div>
-								<input type="email" class="form-control" placeholder="Benito@example.com" aria-label="Username" aria-describedby="basic-addon1" required="" name="email">
+								<input type="email" class="form-control" placeholder="Benito@example.com" aria-label="Username" aria-describedby="basic-addon1" required="" name="email" id="email">
 							</div>
 						</div>
 						<!-- Contraseña -->
@@ -219,9 +219,10 @@
 							Cancelar
 						</button>
 						<button type="submit" class="btn btn-primary">
-							Agregar
+							Guardar
 						</button>
-						<input type="hidden" name="action" value="store">
+						<input type="hidden" name="action" id="action" value="store">
+						<input type="hidden" name="id" id="id">
 					</div>
 				</form>
 			</div>
@@ -267,6 +268,24 @@
 					});
 				}
 			});
+		}
+
+		function editar(target){
+
+			var info = $(target).data('info');
+
+			$("#name").val(info.name)
+			$("#email").val(info.email)
+			$("#pass1").val(info.password)
+			$("#pass2").val(info.password)
+			$("#id").val(info.id)
+
+			$("#action").val('update')
+		}
+
+		function add(){
+			$("#action").val('update')
+			document.getElementById("myForm").reset();
 		}
 	</script>
 </body>
