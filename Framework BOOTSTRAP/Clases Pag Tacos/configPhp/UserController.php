@@ -27,6 +27,14 @@
 				$userController->update($name,$email,$password,$id);
 
 				break;
+
+			case 'remove':
+
+				$id = strip_tags($_POST['id']);
+
+				echo json_encode( $userController->remove($id) );
+
+				break;
 		}
 	}
 
@@ -114,6 +122,49 @@
 				$_SESSION['message'] = "Error durante la conexion";
 
 				header("Location:" . $_SERVER['HTTP_REFERER']); 
+			}
+		}
+
+		function remove( $id ){
+			$conn = connect();
+			if ( !$conn->connect_error ) {
+
+				if ( $id!="" ) {
+
+					$query = "delete from user where id = ?";
+					$prepared_query = $conn->prepare($query);
+					$prepared_query->bind_param('i',$id);
+
+					if ( $prepared_query->execute() ) { 
+
+						$respuesta = array(
+							'status' => "success",
+							'message' => "El registro se ha eliminado correctamente"
+						);
+						return $respuesta;
+					} else {
+
+						$respuesta = array(
+							'status' => "error",
+							'message' => "El registro no se ha eliminado correctamente"
+						);
+						return $respuesta;
+					}
+				} else { 
+
+					$respuesta = array(
+						'status' => "error",
+						'message' => "Revise la informacion enviada"
+					);
+					return $respuesta;
+				}
+			} else { 
+
+				$respuesta = array(
+					'status' => "error",
+					'message' => "Error durante la conexion"
+				);
+				return $respuesta; 
 			}
 		}
 	}

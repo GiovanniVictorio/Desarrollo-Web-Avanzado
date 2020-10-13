@@ -133,7 +133,7 @@
 											<button type="button" class="btn btn-warning" data-info='<?= json_encode($user) ?>' data-toggle="modal" data-target="#staticBackdrop" onclick="editar(this)" >
 												<i class="fa fa-pencil"></i> Editar
 											</button>
-											<button type="button" onclick="remove(1)" class="btn btn-warning">
+											<button type="button" onclick="remove(<?= $user['id'] ?>,this)" class="btn btn-warning">
 												<i class="fa fa-trash"></i> Eliminar
 											</button>
 										</td>
@@ -218,7 +218,7 @@
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">
 							Cancelar
 						</button>
-						<button type="submit" class="btn btn-primary">
+						<button type="submit" class="btn btn-primary" id="btn">
 							Guardar
 						</button>
 						<input type="hidden" name="action" id="action" value="store">
@@ -240,11 +240,13 @@
 	<script type="text/javascript">
 
 		function validateRegister(){
+
 			if ( $("#pass1").val() == $("#pass2").val() ){
+				$("#action").val('store')
 				return true;
 			} else {
-				$("#pass1").addclass('is-invalid')
-				$("#pass2").addclass('is-invalid')
+				$("#pass1").addClass('is-invalid')
+				$("#pass2").addClass('is-invalid')
 
 				swal("", "!Las contraseñas no coinciden¡", "error");
 
@@ -252,7 +254,7 @@
 			}
 		}
 
-		function remove(id){
+		function remove(id,target){
 			swal({
 				title: "",
 				text: "¿Desea eliminar el usuario?",
@@ -263,14 +265,43 @@
 			})
 			.then( (willDelete) => {
 				if ( willDelete ){
-					swal("Usuario eliminado con exito!", {
-						icon: "success",
+
+					$.ajax({
+						url: 'configPhp/UserController.php',
+						type: 'POST',
+						dataType: 'json',
+						data: { action: 'remove', id:id },
+						success: function(json) {
+
+							if ( json.status == 'success' ) {
+
+								swal( json.message, {
+									icon: "success",
+								});
+								$(target).parent().parent().remove();
+							} else {
+
+								swal( json.message, {
+									icon: "error",
+								});
+							}
+						}, 
+						error: function( xhr, status ){
+
+							console.log(xhr)
+							console.log(status)
+						}
 					});
+				} else {
+					swal("Tus  datos estan guardados!");
 				}
 			});
 		}
 
 		function editar(target){
+
+			$("#btn").text("Guardar")
+			$("#staticBackdropLabel").text("Editar Usuario")
 
 			var info = $(target).data('info');
 
@@ -284,7 +315,9 @@
 		}
 
 		function add(){
-			$("#action").val('update')
+			$("#btn").text("Agregar")
+			$("#staticBackdropLabel").text("Agregar Usuario")
+			$("#action").val('store')
 			document.getElementById("myForm").reset();
 		}
 	</script>
